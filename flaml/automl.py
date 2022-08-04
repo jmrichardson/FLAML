@@ -678,7 +678,7 @@ class AutoML(BaseEstimator):
              }
          }
         ```
-            skip_transform: boolean, default=False | Whether to pre-process data prior to modeling
+            skip_transform: boolean, default=False | Whether to pre-process data prior to modeling.
             val_func: function, default=np.mean | Validation metric aggregation function
             fit_kwargs_by_estimator: dict, default=None | The user specified keywords arguments, grouped by estimator name.
                 e.g.,
@@ -2295,7 +2295,7 @@ class AutoML(BaseEstimator):
         }
         ```
 
-        skip_transform: boolean, default=False | Whether to pre-process data prior to modeling
+        skip_transform: boolean, default=False | Whether to pre-process data prior to modeling.
         val_func: function, default=np.mean | Validation metric aggregation function
         fit_kwargs_by_estimator: dict, default=None | The user specified keywords arguments, grouped by estimator name.
                 For TransformersEstimator, available fit_kwargs can be found from
