@@ -469,6 +469,8 @@ def evaluate_model_CV(
         kf = kf.split(X_train_split)
     rng = np.random.RandomState(2020)
     val_loss_list = []
+    val_losses = []
+    metrics = []
     budget_per_train = budget / n
     if "sample_weight" in fit_kwargs:
         weight = fit_kwargs["sample_weight"]
@@ -515,32 +517,27 @@ def evaluate_model_CV(
             fit_kwargs["sample_weight"] = weight
         valid_fold_num += 1
         total_fold_num += 1
-        total_val_loss += val_loss_i
+        val_losses.append(val_loss_i)
         if log_training_metric or not isinstance(eval_metric, str):
-            if isinstance(total_metric, dict):
-                total_metric = {k: total_metric[k] + v for k, v in metric_i.items()}
-            elif total_metric is not None:
-                total_metric += metric_i
-            else:
-                total_metric = metric_i
+                metrics.append(metric_i)
         train_time += train_time_i
         pred_time += pred_time_i
         if valid_fold_num == n:
-            val_loss_list.append(total_val_loss / valid_fold_num)
-            total_val_loss = valid_fold_num = 0
+            val_loss_list.append(np.mean(val_losses))
+            val_losses = []
+            valid_fold_num = 0
         elif time.time() - start_time >= budget:
-            val_loss_list.append(total_val_loss / valid_fold_num)
+            val_loss_list.append(np.mean(val_losses))
             break
     val_loss = np.max(val_loss_list)
-    n = total_fold_num
     if log_training_metric or not isinstance(eval_metric, str):
-        if isinstance(total_metric, dict):
-            metric = {k: v / n for k, v in total_metric.items()}
+        if isinstance(metrics[0], dict):
+            df = pd.DataFrame(metrics)
+            metric = pd.DataFrame([np.mean(df[c]) for c in df], index=[k for k,v in metrics[0].items()]).to_dict()[0]
         else:
-            metric = total_metric / n
-    pred_time /= n
+            metric = np.mean(metrics)
+    pred_time /= total_fold_num
     return val_loss, metric, train_time, pred_time
-
 
 def compute_estimator(
     X_train,

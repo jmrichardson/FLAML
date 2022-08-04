@@ -679,6 +679,7 @@ class AutoML(BaseEstimator):
          }
         ```
             skip_transform: boolean, default=False | Whether to pre-process data prior to modeling
+            val_func: function, default=np.mean | Validation metric aggregation function
             fit_kwargs_by_estimator: dict, default=None | The user specified keywords arguments, grouped by estimator name.
                 e.g.,
 
@@ -734,6 +735,7 @@ class AutoML(BaseEstimator):
         )
         settings["custom_hp"] = settings.get("custom_hp", {})
         settings["skip_transform"] = settings.get("skip_transform", False)
+        settings["val_func"] = settings.get("val_func", np.mean)
 
         self._estimator_type = (
             "classifier" if settings["task"] in CLASSIFICATION else "regressor"
@@ -2073,6 +2075,7 @@ class AutoML(BaseEstimator):
         metric_constraints=None,
         custom_hp=None,
         skip_transform=None,
+        val_func=None,
         fit_kwargs_by_estimator=None,
         **fit_kwargs,
     ):
@@ -2293,6 +2296,7 @@ class AutoML(BaseEstimator):
         ```
 
         skip_transform: boolean, default=False | Whether to pre-process data prior to modeling
+        val_func: function, default=np.mean | Validation metric aggregation function
         fit_kwargs_by_estimator: dict, default=None | The user specified keywords arguments, grouped by estimator name.
                 For TransformersEstimator, available fit_kwargs can be found from
                 [TrainingArgumentsForAuto](nlp/huggingface/training_args).
@@ -2425,6 +2429,7 @@ class AutoML(BaseEstimator):
         self._state.fit_kwargs = fit_kwargs
         custom_hp = custom_hp or self._settings.get("custom_hp")
         self._skip_transform = self._settings.get("skip_transform") if skip_transform is None else skip_transform
+        self._val_func = self._settings.get("val_func") if val_func is None else val_func
         fit_kwargs_by_estimator = fit_kwargs_by_estimator or self._settings.get(
             "fit_kwargs_by_estimator"
         )
