@@ -481,7 +481,7 @@ def evaluate_model_CV(
     def sharpe(x):
         mean = np.mean(x)
         std = np.std(x)
-        s = mean / std
+        s = mean + std  # Add std (minimization optimization)
         return s
 
     for train_index, val_index in kf:
@@ -539,8 +539,7 @@ def evaluate_model_CV(
     val_loss = np.max(val_loss_list)
     if log_training_metric or not isinstance(eval_metric, str):
         if isinstance(metrics[0], dict):
-            df = pd.DataFrame(metrics)
-            metric = pd.DataFrame([sharpe(df[c]) for c in df], index=[k for k,v in metrics[0].items()]).to_dict()[0]
+            metric = pd.DataFrame(metrics).to_dict()
         else:
             metric = np.mean(metrics)
     pred_time /= total_fold_num
