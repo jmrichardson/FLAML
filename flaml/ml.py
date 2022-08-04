@@ -477,6 +477,13 @@ def evaluate_model_CV(
         weight_val = None
     else:
         weight = weight_val = None
+
+    def sharpe(x):
+        mean = np.mean(x)
+        std = np.std(x)
+        s = mean / std
+        return s
+
     for train_index, val_index in kf:
         if shuffle:
             train_index = rng.permutation(train_index)
@@ -523,17 +530,17 @@ def evaluate_model_CV(
         train_time += train_time_i
         pred_time += pred_time_i
         if valid_fold_num == n:
-            val_loss_list.append(np.mean(val_losses))
+            val_loss_list.append(sharpe(val_losses))
             val_losses = []
             valid_fold_num = 0
         elif time.time() - start_time >= budget:
-            val_loss_list.append(np.mean(val_losses))
+            val_loss_list.append(sharpe(val_losses))
             break
     val_loss = np.max(val_loss_list)
     if log_training_metric or not isinstance(eval_metric, str):
         if isinstance(metrics[0], dict):
             df = pd.DataFrame(metrics)
-            metric = pd.DataFrame([np.mean(df[c]) for c in df], index=[k for k,v in metrics[0].items()]).to_dict()[0]
+            metric = pd.DataFrame([sharpe(df[c]) for c in df], index=[k for k,v in metrics[0].items()]).to_dict()[0]
         else:
             metric = np.mean(metrics)
     pred_time /= total_fold_num
