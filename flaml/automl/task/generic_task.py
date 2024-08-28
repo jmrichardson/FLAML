@@ -492,7 +492,7 @@ class GenericTask(Task):
                     ) = self._split_pyspark(state, X_train_all, y_train_all, split_ratio)
                 else:
                     X_train, X_val, y_train, y_val = self._split_pyspark(state, X_train_all, y_train_all, split_ratio)
-            if split_type == "group":
+            elif split_type == "group":
                 gss = GroupShuffleSplit(n_splits=1, test_size=split_ratio, random_state=RANDOM_SEED)
                 for train_idx, val_idx in gss.split(X_train_all, y_train_all, state.groups_all):
                     if data_is_df:
